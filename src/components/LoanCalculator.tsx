@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calculator, DollarSign, Coins } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const cryptoOptions = [
   { value: "BTC", label: "Bitcoin (BTC)", icon: "₿" },
@@ -46,6 +46,7 @@ const LoanCalculator = () => {
     rate: number;
     monthly: number;
     total: number;
+    collateralRequired: number;
   }>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [mascotState, setMascotState] = useState<"idle" | "thinking" | "happy" | "error">("idle");
@@ -83,10 +84,14 @@ const LoanCalculator = () => {
         (Number(amount) * monthlyRate * Math.pow(1 + monthlyRate, Number(term))) /
         (Math.pow(1 + monthlyRate, Number(term)) - 1);
       
+      // Calculate collateral required (2x the loan amount due to 50% LTV)
+      const collateralRequired = Number(amount) * 2;
+      
       setResults({
         rate: rate * 100,
         monthly: monthlyPayment,
         total: monthlyPayment * Number(term),
+        collateralRequired,
       });
       
       setIsCalculating(false);
@@ -94,9 +99,18 @@ const LoanCalculator = () => {
       
       toast({
         title: "Calculation Complete! 🐼",
-        description: "Your loan details are ready to view.",
+        description: `Your loan details are ready. Required collateral: ${collateralRequired} Panda Tokens 🐼`,
       });
     }, 1500);
+  };
+
+  const handleApply = () => {
+    if (results) {
+      toast({
+        title: "Loan Application Submitted! 🎉",
+        description: `Please deposit the required collateral of ${results.collateralRequired} Panda Tokens 🐼 to proceed.`,
+      });
+    }
   };
 
   return (
@@ -193,7 +207,16 @@ const LoanCalculator = () => {
               <span className="font-medium">${results.monthly.toFixed(2)}</span>
               <span className="text-gray-600">Total Payment:</span>
               <span className="font-medium">${results.total.toFixed(2)}</span>
+              <span className="text-gray-600">Collateral Required:</span>
+              <span className="font-medium">{results.collateralRequired} Panda Tokens 🐼</span>
             </div>
+            
+            <Button
+              onClick={handleApply}
+              className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white"
+            >
+              Apply for Loan
+            </Button>
           </div>
         )}
       </div>
