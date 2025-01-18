@@ -1,9 +1,23 @@
 import LoanCalculator from "@/components/LoanCalculator";
 import LoanAdmissionForm from "@/components/LoanAdmissionForm";
+import { Twitter } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary to-white relative overflow-hidden">
+      {/* Social Media Links */}
+      <div className="absolute top-4 right-4 z-10">
+        <a
+          href="https://x.com/PandaRates"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-600 hover:text-primary transition-colors duration-200"
+          aria-label="Follow us on Twitter"
+        >
+          <Twitter className="w-6 h-6 animate-bounce-slight" />
+        </a>
+      </div>
+
       {/* Floating Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 text-6xl animate-float opacity-10">₿</div>
