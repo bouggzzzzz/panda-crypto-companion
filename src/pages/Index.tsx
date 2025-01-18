@@ -1,4 +1,5 @@
 import LoanCalculator from "@/components/LoanCalculator";
+import LoanAdmissionForm from "@/components/LoanAdmissionForm";
 
 const Index = () => {
   return (
@@ -21,9 +22,16 @@ const Index = () => {
         
         {/* Calculator Section */}
         <div className="max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "0.4s" }}>
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
+          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl mb-16">
             <h2 className="text-2xl font-semibold mb-8">Calculate Your Crypto Loan</h2>
             <LoanCalculator />
+          </div>
+        </div>
+
+        {/* Loan Application Form Section */}
+        <div className="max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "0.6s" }}>
+          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
+            <LoanAdmissionForm />
           </div>
         </div>
         
