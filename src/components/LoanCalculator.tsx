@@ -2,41 +2,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, DollarSign, Coins } from "lucide-react";
+import { Calculator, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PandaMascot } from "./loan/PandaMascot";
+import { LoanResults } from "./loan/LoanResults";
 
 const cryptoOptions = [
   { value: "BTC", label: "Bitcoin (BTC)", icon: "₿" },
   { value: "ETH", label: "Ethereum (ETH)", icon: "Ξ" },
   { value: "SOL", label: "Solana (SOL)", icon: "◎" },
 ];
-
-const PandaMascot = ({ state }: { state: "idle" | "thinking" | "happy" | "error" }) => {
-  const expressions = {
-    idle: "🐼",
-    thinking: "🤔",
-    happy: "🐼✨",
-    error: "😅",
-  };
-
-  const messages = {
-    idle: "Hi! Let's calculate your loan rate!",
-    thinking: "Crunching the numbers...",
-    happy: "Here's your personalized rate!",
-    error: "Oops! Please check your inputs.",
-  };
-
-  return (
-    <div className="flex flex-col items-center space-y-2">
-      <div className={`text-4xl ${state === "thinking" ? "animate-bounce-slight" : "animate-float"}`}>
-        {expressions[state]}
-      </div>
-      <div className="bg-white px-4 py-2 rounded-full shadow-lg text-sm font-medium animate-float">
-        {messages[state]}
-      </div>
-    </div>
-  );
-};
 
 const LoanCalculator = () => {
   const [amount, setAmount] = useState("");
@@ -102,15 +77,6 @@ const LoanCalculator = () => {
         description: `Your loan details are ready. Required collateral: ${collateralRequired} Panda Tokens 🐼`,
       });
     }, 1500);
-  };
-
-  const handleApply = () => {
-    if (results) {
-      toast({
-        title: "Loan Application Submitted! 🎉",
-        description: `Please deposit the required collateral of ${results.collateralRequired} Panda Tokens 🐼 to proceed.`,
-      });
-    }
   };
 
   return (
@@ -194,31 +160,7 @@ const LoanCalculator = () => {
           )}
         </Button>
 
-        {results && (
-          <div className="mt-6 p-4 bg-secondary rounded-lg space-y-3 animate-fade-in">
-            <h3 className="font-semibold text-lg flex items-center">
-              <Coins className="mr-2 h-5 w-5 animate-spin-slow" />
-              Loan Summary
-            </h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <span className="text-gray-600">Interest Rate:</span>
-              <span className="font-medium">{results.rate.toFixed(2)}%</span>
-              <span className="text-gray-600">Monthly Payment:</span>
-              <span className="font-medium">${results.monthly.toFixed(2)}</span>
-              <span className="text-gray-600">Total Payment:</span>
-              <span className="font-medium">${results.total.toFixed(2)}</span>
-              <span className="text-gray-600">Collateral Required:</span>
-              <span className="font-medium">{results.collateralRequired} Panda Tokens 🐼</span>
-            </div>
-            
-            <Button
-              onClick={handleApply}
-              className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white"
-            >
-              Apply for Loan
-            </Button>
-          </div>
-        )}
+        {results && <LoanResults {...results} />}
       </div>
     </div>
   );
