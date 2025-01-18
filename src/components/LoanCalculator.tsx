@@ -2,14 +2,41 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, DollarSign } from "lucide-react";
+import { Calculator, DollarSign, Coins } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const cryptoOptions = [
-  { value: "BTC", label: "Bitcoin (BTC)" },
-  { value: "ETH", label: "Ethereum (ETH)" },
-  { value: "SOL", label: "Solana (SOL)" },
+  { value: "BTC", label: "Bitcoin (BTC)", icon: "₿" },
+  { value: "ETH", label: "Ethereum (ETH)", icon: "Ξ" },
+  { value: "SOL", label: "Solana (SOL)", icon: "◎" },
 ];
+
+const PandaMascot = ({ state }: { state: "idle" | "thinking" | "happy" | "error" }) => {
+  const expressions = {
+    idle: "🐼",
+    thinking: "🤔",
+    happy: "🐼✨",
+    error: "😅",
+  };
+
+  const messages = {
+    idle: "Hi! Let's calculate your loan rate!",
+    thinking: "Crunching the numbers...",
+    happy: "Here's your personalized rate!",
+    error: "Oops! Please check your inputs.",
+  };
+
+  return (
+    <div className="flex flex-col items-center space-y-2">
+      <div className={`text-4xl ${state === "thinking" ? "animate-bounce-slight" : "animate-float"}`}>
+        {expressions[state]}
+      </div>
+      <div className="bg-white px-4 py-2 rounded-full shadow-lg text-sm font-medium animate-float">
+        {messages[state]}
+      </div>
+    </div>
+  );
+};
 
 const LoanCalculator = () => {
   const [amount, setAmount] = useState("");
@@ -21,10 +48,12 @@ const LoanCalculator = () => {
     total: number;
   }>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [mascotState, setMascotState] = useState<"idle" | "thinking" | "happy" | "error">("idle");
   const { toast } = useToast();
 
   const calculateLoan = () => {
     if (!amount || !term || !crypto) {
+      setMascotState("error");
       toast({
         title: "Missing Information",
         description: "Please fill in all fields to calculate your loan.",
@@ -34,6 +63,15 @@ const LoanCalculator = () => {
     }
 
     setIsCalculating(true);
+    setMascotState("thinking");
+    
+    // Fun easter egg
+    if (amount === "420" || amount === "69") {
+      toast({
+        title: "Nice choice! 😎",
+        description: "Our panda approves of your humor!",
+      });
+    }
     
     // Simulate API call
     setTimeout(() => {
@@ -52,6 +90,7 @@ const LoanCalculator = () => {
       });
       
       setIsCalculating(false);
+      setMascotState("happy");
       
       toast({
         title: "Calculation Complete! 🐼",
@@ -61,8 +100,10 @@ const LoanCalculator = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <div className="space-y-6">
+    <div className="w-full max-w-md mx-auto space-y-8">
+      <PandaMascot state={mascotState} />
+      
+      <div className="bg-white p-6 rounded-xl shadow-lg space-y-6">
         <div className="space-y-2">
           <label className="text-sm font-medium">Loan Amount (USD)</label>
           <div className="relative">
@@ -71,8 +112,11 @@ const LoanCalculator = () => {
               type="number"
               placeholder="Enter amount"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="pl-10"
+              onChange={(e) => {
+                setAmount(e.target.value);
+                setMascotState("idle");
+              }}
+              className="pl-10 transition-all duration-200 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
@@ -83,20 +127,35 @@ const LoanCalculator = () => {
             type="number"
             placeholder="Enter term in months"
             value={term}
-            onChange={(e) => setTerm(e.target.value)}
+            onChange={(e) => {
+              setTerm(e.target.value);
+              setMascotState("idle");
+            }}
+            className="transition-all duration-200 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
 
         <div className="space-y-2">
           <label className="text-sm font-medium">Cryptocurrency</label>
-          <Select value={crypto} onValueChange={setCrypto}>
-            <SelectTrigger>
+          <Select 
+            value={crypto} 
+            onValueChange={(value) => {
+              setCrypto(value);
+              setMascotState("idle");
+            }}
+          >
+            <SelectTrigger className="transition-all duration-200 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary/20">
               <SelectValue placeholder="Select cryptocurrency" />
             </SelectTrigger>
             <SelectContent>
               {cryptoOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
+                  className="flex items-center space-x-2"
+                >
+                  <span className="font-mono">{option.icon}</span>
+                  <span>{option.label}</span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -105,7 +164,7 @@ const LoanCalculator = () => {
 
         <Button
           onClick={calculateLoan}
-          className="w-full"
+          className="w-full group hover:scale-[1.02] transition-all duration-200"
           disabled={isCalculating}
         >
           {isCalculating ? (
@@ -116,14 +175,17 @@ const LoanCalculator = () => {
           ) : (
             <span className="flex items-center">
               Calculate Rate
-              <Calculator className="ml-2 h-4 w-4" />
+              <Calculator className="ml-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-200" />
             </span>
           )}
         </Button>
 
         {results && (
-          <div className="mt-6 p-4 bg-secondary rounded-lg space-y-3">
-            <h3 className="font-semibold text-lg">Loan Summary</h3>
+          <div className="mt-6 p-4 bg-secondary rounded-lg space-y-3 animate-fade-in">
+            <h3 className="font-semibold text-lg flex items-center">
+              <Coins className="mr-2 h-5 w-5 animate-spin-slow" />
+              Loan Summary
+            </h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <span className="text-gray-600">Interest Rate:</span>
               <span className="font-medium">{results.rate.toFixed(2)}%</span>
